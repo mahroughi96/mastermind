@@ -1,0 +1,14 @@
+.pageBody {
+  background-color: aquamarine;
+  position: relative;
+  left: 500px;
+  top: 200px;
+  width: 800px;
+}
+.inputView {
+  background-color: grey; 
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  align-items: center;
+}
