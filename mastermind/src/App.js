@@ -8,12 +8,13 @@ class App extends Component {
     super(props);
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
-    this.checkAnswer=this.checkAnswer.bind(this);
-
+    this.checkAnswer = this.checkAnswer.bind(this);
+    this.numberGenerator = this.numberGenerator.bind(this);
 
     this.state = {
       userAnswer: "",
-      show: false,
+      answer: this.numberGenerator(),
+      show: false
     };
   }
 
@@ -23,14 +24,15 @@ class App extends Component {
         <h1>my number is between (0-100), try guessing!</h1>
         <Jumbotron className="inputView">
           <input
-            placeholder="place your guess"
+            placeholder="your guess"
             onChange={e => this.setState({ userAnswer: e.target.value })}
+            value={this.state.userAnswer}
           />
-          <Button variant="outline-info" onClick={this.checkAnswer}>
+          <Button variant="outline-info" onClick={this.checkAnswer(this)}>
             submit your answer
           </Button>
         </Jumbotron>
-        <Modal show={this.state.show} onHide={this.hideModal}>
+        <Modal show={this.state.show}>
           <p>YOU WIN</p>
           <Button onClick={this.numberGenerator}>Play again!</Button>
         </Modal>
@@ -59,17 +61,19 @@ class App extends Component {
   };
 
   numberGenerator() {
-    this.answer = Math.random() * 100;
+    this.answer = Math.floor(Math.random() * 100);
+    console.log("answer generated: ", this.answer);
     return this.answer;
+    
   }
 
   checkAnswer(userAnswer) {
- 
-    if (this.answer == userAnswer) {
-      this.showModal();
-    } else if (this.answer > userAnswer) {
+    console.log(userAnswer);
+    if (this.answer === Number(userAnswer)) {
+      console.log("hooooray");
+    } else if (this.answer > Number(userAnswer)) {
       this.showHint(1);
-    } else if (this.answer < userAnswer) {
+    } else if (this.answer < Number(userAnswer)) {
       this.showHint(-1);
     }
   }
