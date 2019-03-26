@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Modal, Jumbotron } from "react-bootstrap";
+import { Button, Modal, Jumbotron, Table } from "react-bootstrap";
 
 import "./App.css";
 
@@ -27,7 +27,6 @@ class App extends Component {
   }
 
   render() {
-
     return (
       <div class="justify-content-md-center pageBody">
         <h1>my number is between (0-100), try guessing!</h1>
@@ -48,6 +47,21 @@ class App extends Component {
 
           {this.state.hint}
         </Jumbotron>
+        {/* <Table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>guess</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>{id}</th>
+              <th>{}</th>
+            </tr>
+          </tbody>
+        </Table> */}
+        <ul>{this.itemList}</ul>
         <Modal show={this.state.show}>
           <p>YOU WIN</p>
           <Button
@@ -84,12 +98,15 @@ class App extends Component {
   }
 
   guessHandler = userAnswer => {
-    this.setState({guesses: userAnswer });
+    const newGuesses = [...this.state.guesses, userAnswer];
+    this.setState({ guesses: newGuesses });
+    const itemList = this.state.guesses.map(item => <li>{item}</li>);
+    console.log(this.state.guesses);
+    return itemList;
   };
 
   checkAnswer = userAnswer => {
-    console.log(this.state.guesses);
-    this.guessHandler();
+
     if (this.state.answer === Number(userAnswer)) {
       this.handleToggle();
     } else if (this.state.answer > Number(userAnswer)) {
