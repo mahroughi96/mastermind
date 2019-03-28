@@ -18,6 +18,9 @@ class App extends Component {
       userAnswer: undefined,
       answer: undefined,
       show: false,
+      message: undefined,
+      buttonMsg: undefined,
+      hint: "GO!",
       guesses: []
     };
   }
@@ -26,95 +29,149 @@ class App extends Component {
     this.playAgain();
   }
 
-  render() {
-    return (
-      <div class="justify-content-md-center pageBody">
-        <h1>my number is between (0-100), try guessing!</h1>
-        <Jumbotron className="inputView">
-          <input
-            placeholder="your guess"
-            onChange={e => this.setState({ userAnswer: e.target.value })}
-          />
-          <Button
-            variant="info"
-            onClick={() => {
-              this.checkAnswer(this.state.userAnswer);
-              this.guessHandler(this.state.userAnswer);
-            }}
-          >
-            submit your answer
-          </Button>
-
-          {this.state.hint}
-        </Jumbotron>
-        {/* <Table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>guess</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>{id}</th>
-              <th>{}</th>
-            </tr>
-          </tbody>
-        </Table> */}
-        <ul>{this.itemList}</ul>
-        <Modal show={this.state.show}>
-          <p>YOU WIN</p>
-          <Button
-            variant="success"
-            onClick={() => {
-              this.playAgain();
-              this.handleToggle();
-            }}
-          >
-            Play again!
-          </Button>
-        </Modal>
-      </div>
-    );
-  }
+  resetUserAnswer = () => this.setState({ userAnswer: "" });
+  resetGuesses = () => this.setState({ guesses: [] });
+  resetAnswer = number => this.setState({ answer: number });
 
   playAgain() {
     const answer = numberGenerator();
     console.log(answer);
-    this.setState({ answer, userAnswer: undefined });
+    this.resetUserAnswer();
+    this.resetGuesses();
+    this.resetAnswer(answer);
   }
 
-  handleToggle = () => {
+  handleToggle = (message, buttonMsg) => {
     this.setState(prevState => {
-      return { show: !prevState.show };
+      return {
+        show: !prevState.show,
+        message: message,
+        buttonMsg: buttonMsg
+      };
     });
   };
 
-  setHint(id) {
-    let options = ["higher", "lower"];
-    this.setState({
-      hint: options[id]
-    });
-  }
-
   guessHandler = userAnswer => {
-    const newGuesses = [...this.state.guesses, userAnswer];
-    this.setState({ guesses: newGuesses });
-    const itemList = this.state.guesses.map(item => <li>{item}</li>);
-    console.log(this.state.guesses);
-    return itemList;
+    if (userAnswer) {
+      this.setState({
+        guesses: [
+          ...this.state.guesses,
+          {
+            id: this.state.guesses.length + 1,
+            guess: userAnswer
+          }
+        ]
+      });
+      if (this.state.guesses.length > 10) {
+        this.handleToggle("you idiot");
+      }
+    }
   };
 
   checkAnswer = userAnswer => {
-
-    if (this.state.answer === Number(userAnswer)) {
-      this.handleToggle();
-    } else if (this.state.answer > Number(userAnswer)) {
-      this.setHint(0);
-    } else if (this.state.answer < Number(userAnswer)) {
-      this.setHint(1);
+    if (userAnswer) {
+      if (this.state.answer === Number(userAnswer)) {
+        this.handleToggle(" You Win! ");
+      } else if (this.state.answer > Number(userAnswer)) {
+        this.setState({ hint: "Higher" });
+        return false;
+      } else if (this.state.answer < Number(userAnswer)) {
+        this.setState({ hint: "Lower" });
+      }
+    } else {
+      this.handleToggle("bi pedar vared kon bad!", "ok!");
     }
   };
+
+  MyModal = ({
+    message,
+    show,
+    buttonMsg = "Play again!"
+  }) => {
+    if (buttonMsg === "ok!") {
+      return (
+        <Modal show={show}>
+          <p>{message}</p>
+          <Button
+            class="m"
+            variant="warning"
+            onClick={() => this.handleClick(1)}
+          >
+            {buttonMsg}
+          </Button>
+        </Modal>
+      );
+    } else {
+      return (
+        <Modal show={show}>
+          <p>{message}</p>
+          <Button class="m" variant="success" onClick={() => this.handleClick()}>
+            {buttonMsg}
+          </Button>
+        </Modal>
+      );
+    }
+  };
+
+  handleClick = status => {
+    if (status) {
+      this.handleToggle();
+    } else {
+      this.playAgain();
+      this.handleToggle();
+    }
+  };
+
+  render() {
+    const { userAnswer, hint, show, message, buttonMsg } = this.state;
+    const itemList = this.state.guesses.map(item => (
+      <tr key={item.id}>
+        <td>{item.id}</td>
+        <td>{item.guess}</td>
+      </tr>
+    ));
+
+    return (
+      <div class="col-lg">
+        <div class="m">
+          <h2>my number is between (0-100), try guessing!</h2>
+        </div>
+        <div class="pageBody">
+          <Jumbotron className="inputView">
+            <input
+              placeholder="your guess"
+              onChange={e => this.setState({ userAnswer: e.target.value })}
+              value={this.state.userAnswer}
+            />
+            <Button
+              class="m"
+              variant="info"
+              onClick={() => {
+                this.checkAnswer(userAnswer);
+                this.guessHandler(userAnswer);
+                this.resetUserAnswer();
+              }}
+            >
+              submit
+            </Button>
+
+            <h3>{hint}</h3>
+          </Jumbotron>
+          <Table class="my-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>guess</th>
+              </tr>
+            </thead>
+            <tbody>{itemList}</tbody>
+          </Table>
+        </div>
+
+        <this.MyModal message={message} show={show} buttonMsg={buttonMsg} />
+      </div>
+    );
+  }
 }
 
 export default App;
