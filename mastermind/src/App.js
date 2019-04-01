@@ -6,7 +6,6 @@ import "./App.css";
 const numberGenerator = () => {
   return Math.floor(Math.random() * 100);
 };
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -68,6 +67,13 @@ class App extends Component {
     }
   };
 
+  tableClick = id => {
+    this.setState(state => {
+      const new_guesses = [...state.guesses.filter(item => item.id <= id)];
+      return { guesses: new_guesses };
+    });
+  };
+
   checkAnswer = userAnswer => {
     if (userAnswer) {
       if (this.state.answer === Number(userAnswer)) {
@@ -83,11 +89,7 @@ class App extends Component {
     }
   };
 
-  MyModal = ({
-    message,
-    show,
-    buttonMsg = "Play again!"
-  }) => {
+  MyModal = ({ message, show, buttonMsg = "Play again!" }) => {
     if (buttonMsg === "ok!") {
       return (
         <Modal show={show}>
@@ -105,7 +107,11 @@ class App extends Component {
       return (
         <Modal show={show}>
           <p>{message}</p>
-          <Button class="m" variant="success" onClick={() => this.handleClick()}>
+          <Button
+            class="m"
+            variant="success"
+            onClick={() => this.handleClick()}
+          >
             {buttonMsg}
           </Button>
         </Modal>
@@ -125,7 +131,8 @@ class App extends Component {
   render() {
     const { userAnswer, hint, show, message, buttonMsg } = this.state;
     const itemList = this.state.guesses.map(item => (
-      <tr key={item.id}>
+      <tr onClick={() => this.tableClick(item.id)} key={item.id}>
+        {/* <Button onClick={() => this.tableClick(item.id)} /> */}
         <td>{item.id}</td>
         <td>{item.guess}</td>
       </tr>
